@@ -1,7 +1,22 @@
 const express = require("express");
+const mongoose=require("mongoose");
 const ejs = require("ejs");
 
 const lodash=require("lodash");
+
+// Mongoose connection
+const dbUrl="mongodb+srv://himat1607:n2pYViK3aTO4plhu@cluster0.6rfsg.mongodb.net/journalDB?retryWrites=true&w=majority";
+mongoose.connect(dbUrl,{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});
+
+// Post Schema
+const postSchema= new mongoose.Schema({
+  title: String,
+  body: String 
+});
+
+//Posts Collection
+const Post=mongoose.model("Post",postSchema);
+
 
 const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
 const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
@@ -9,15 +24,19 @@ const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rho
 
 const app = express();
 
-const posts=[];
-
 app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 app.get("/",function(req,res){
-  res.render("home",{homeStartingContent:homeStartingContent,posts:posts});
+  Post.find({},function(err,result){
+    if(result.length>0){
+      res.render("home",{homeStartingContent:homeStartingContent,posts:result});
+    }else{
+      res.render("home",{homeStartingContent:homeStartingContent,posts:[]});
+    }
+  })
 })
 .get("/about",function(req,res){
   res.render("about",{aboutContent:aboutContent});
@@ -25,29 +44,32 @@ app.get("/",function(req,res){
 .get("/contact",function(req,res){
   res.render("contact",{contactContent:contactContent});
 })
-.get("/post/:postTitle",function(req,res){
-  const searchTitle=lodash.lowerCase(req.params.postTitle);
-  posts.forEach(post=>{
-    if(lodash.lowerCase(post.title)===searchTitle){
-      res.render("post",{postTitle:post.title,postBody:post.body});
-    }
+.get("/post/:postId",function(req,res){
+  // const searchTitle=lodash.lowerCase(req.params.postTitle);
+  const searchID=req.params.postId;
+  Post.findOne({_id: searchID},function(err,result){
+    res.render("post",{postTitle:result.title,postBody:result.body});
   });
 })
 .get("/compose",function(req,res){
   res.render("compose");
 })
-.post("/compose",function(req,res){
-  const post={
+.post("/compose",async function(req,res){
+  const post=new Post({
     title:req.body.newPostTitle,
     body:req.body.newPostBody
-  }
-  posts.push(post);
+  });
+  await post.save();
+  // posts.push(post);
   res.redirect("/");
 })
 
 
 
-
-app.listen(3000, function() {
-  console.log("Server started on port 3000");
+let port= process.env.PORT;
+if(port==null||port==""){
+  port=3000;
+}
+app.listen(port, function() {
+  console.log("Server started on port "+port);
 });

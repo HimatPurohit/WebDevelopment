@@ -3,6 +3,7 @@ const mongoose=require("mongoose");
 const lodash=require("lodash");
 // const date=require(__dirname+"/date.js");
 
+let port = process.env.PORT;
 
 const app=express();
 app.use(express.urlencoded({extended:true}));
@@ -11,40 +12,44 @@ app.use(express.static("public"));
 
 app.set("view engine","ejs");
 
-//Mongoose Connection to MongoDB
-mongoose.connect("mongodb://localhost:27017/todolistDB",{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});
+//Mongoose Connection to local MongoDB
+// mongoose.connect("mongodb://localhost:27017/todolistDB",{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});
 
-const itemsSchema=new mongoose.Schema({name:String});
+// Mongoose connection to MongoDB Atlas(cloud)
+mongoose.connect("mongodb+srv://himat1607:n2pYViK3aTO4plhu@cluster0.6rfsg.mongodb.net/todolistDB?retryWrites=true&w=majority",{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});
 
-const Item=mongoose.model("Item",itemsSchema);
+
+const taskSchema=new mongoose.Schema({name:String});
+
+const Task=mongoose.model("tasks",taskSchema);
 
 // Default items to be added for the first time
-const item1=new Item({
+const task1=new Task({
     name:"Buy Food."
 });
-const item2=new Item({
+const task2=new Task({
     name:"Hit + button to add new task."
 });
-const item3=new Item({
+const task3=new Task({
     name:"<-----select this box to delete the task."
 });
 
-const defaultItems=[item1,item2,item3];
+const defaultTasks=[task1,task2,task3];
 
-//Schema for UserList
-const userListSchema=new mongoose.Schema({
+//Schema for custom User Tasks
+const customTaskSchema=new mongoose.Schema({
     name: String,
-    items: [itemsSchema]
+    items: [taskSchema]
 });
 
-const UserListItem=mongoose.model("userList",userListSchema);
+const customTask=mongoose.model("customtasks",customTaskSchema);
 
 
 app.get("/",function(req,res){
     //fetching the data from database
-    Item.find({},function(err,result){
+    Task.find({},async function(err,result){
         if(result.length===0){
-            Item.insertMany(defaultItems,function(err){
+            await Task.insertMany(defaultTasks,function(err){
                 if(err){console.log(err)}
             });
             res.redirect("/");
@@ -54,25 +59,26 @@ app.get("/",function(req,res){
     });
 })
 .get("/:userList",function(req,res){
-    const userListName= lodash.capitalize(req.params.userList);
+    const customTaskName= lodash.capitalize(req.params.userList);
+    console.log(req.params);
     
-    UserListItem.findOne({name:userListName},function(err,result){
+    customTask.findOne({name:customTaskName},async function(err,result){
         if(!err){
         if(!result){
-                const list=new UserListItem({
-                    name:userListName,
-                    items: defaultItems
+                const task=new customTask({
+                    name:customTaskName,
+                    items: defaultTasks
                 });
-                list.save();
-            res.redirect("/"+userListName);
+                await task.save();
+                res.redirect("/"+customTaskName);
         }else{
-            res.render("list",{listTitle:userListName, newListItems:result.items}); 
+            res.render("list",{listTitle:customTaskName, newListItems:result.items}); 
         }
     }
 
 });
 })
-.post("/",function(req,res){
+.post("/",async function(req,res){
     var newItem=req.body.newItem;
     var listname=req.body.listName;
     // if(item!=""){
@@ -87,18 +93,20 @@ app.get("/",function(req,res){
 
     // Uploading latest Added Item in Database
     if(newItem!=""){
-        const item=new Item({
+        const task=new Task({
             name:newItem
         });
         // Checks the list to be used
         if(listname==="Today"){
-            item.save();
+            await task.save();
             res.redirect("/");
         }else{
-            UserListItem.findOne({name:listname},function(err,result){
-            result.items.push(item);
-            result.save();
-            res.redirect("/"+listname);
+            customTask.findOne({name:listname},async function(err,result){
+                if(!err){
+                    result.items.push(task);
+                    await result.save();
+                    res.redirect("/"+listname);
+                }
         });
         }
     }
@@ -116,7 +124,7 @@ app.get("/",function(req,res){
     // });
     // Checks the list to be used
     if(listname==="Today"){
-        Item.findByIdAndRemove(id,function(err){
+        Task.findByIdAndRemove(id,function(err){
             if(err){
                 console.log(err);
             }else{
@@ -124,7 +132,7 @@ app.get("/",function(req,res){
             };
         });
     }else{
-        UserListItem.findOneAndUpdate({name:listname},
+        customTask.findOneAndUpdate({name:listname},
             {$pull:{items: {_id:id}}},function(err){
             if(err){
                 console.log(err);
@@ -136,6 +144,13 @@ app.get("/",function(req,res){
     
 })
 
-app.listen(3000,function(){
-    console.log("Server started at localhost:3000");
-});
+
+
+if (port == null || port == "") {
+  port = 3000;
+}
+app.listen(port);
+
+// app.listen(port,function(){
+//     console.log("Server started at localhost:3000");
+// });
