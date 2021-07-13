@@ -2,5 +2,8 @@
     
     <h1><%= postTitle %></h1>
     <p><%= postBody %></p>
+    <% if(postLink!=""){ %>
+        <a href="<%= postLink %>">Check</a>
+    <% } %>
 
 <%- include("partials/footer") %> 

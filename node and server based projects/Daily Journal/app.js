@@ -5,13 +5,14 @@ const ejs = require("ejs");
 const lodash=require("lodash");
 
 // Mongoose connection
-const dbUrl="mongodb+srv://himat1607:n2pYViK3aTO4plhu@cluster0.6rfsg.mongodb.net/journalDB?retryWrites=true&w=majority";
+const dbUrl="mongodb+srv://himat1607:"+process.env.mongodbpass+"@cluster0.6rfsg.mongodb.net/journalDB?retryWrites=true&w=majority";
 mongoose.connect(dbUrl,{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});
 
 // Post Schema
 const postSchema= new mongoose.Schema({
   title: String,
-  body: String 
+  body: String,
+  link: String
 });
 
 //Posts Collection
@@ -48,7 +49,7 @@ app.get("/",function(req,res){
   // const searchTitle=lodash.lowerCase(req.params.postTitle);
   const searchID=req.params.postId;
   Post.findOne({_id: searchID},function(err,result){
-    res.render("post",{postTitle:result.title,postBody:result.body});
+    res.render("post",{postTitle:result.title,postBody:result.body,postLink:result.link});
   });
 })
 .get("/compose",function(req,res){
@@ -57,7 +58,8 @@ app.get("/",function(req,res){
 .post("/compose",async function(req,res){
   const post=new Post({
     title:req.body.newPostTitle,
-    body:req.body.newPostBody
+    body:req.body.newPostBody,
+    link:req.body.newPostLink
   });
   await post.save();
   // posts.push(post);

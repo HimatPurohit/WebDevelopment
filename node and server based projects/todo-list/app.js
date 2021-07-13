@@ -16,7 +16,7 @@ app.set("view engine","ejs");
 // mongoose.connect("mongodb://localhost:27017/todolistDB",{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});
 
 // Mongoose connection to MongoDB Atlas(cloud)
-mongoose.connect("mongodb+srv://himat1607:n2pYViK3aTO4plhu@cluster0.6rfsg.mongodb.net/todolistDB?retryWrites=true&w=majority",{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});
+mongoose.connect("mongodb+srv://himat1607:"+process.env.mongodbpass+"@cluster0.6rfsg.mongodb.net/todolistDB?retryWrites=true&w=majority",{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});
 
 
 const taskSchema=new mongoose.Schema({name:String});

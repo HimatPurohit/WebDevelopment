@@ -3,12 +3,16 @@
 <h1>Compose</h1>
 <form action="/compose" method="post">
     <div class="form-group">
-<label class="col-12" for="PostTitle">Title</label>
+<label for="PostTitle">Title</label>
 <input type="text" class="form-control" id="PostTitle" name="newPostTitle" autocomplete="off" required>
 </div>
 <div class="form-group">
 <label for="PostBody">Post</label>
 <textarea id="PostBody" class="form-control" name="newPostBody" rows="5" required></textarea>
+</div>
+<div class="form-group">
+    <label for="PostLink">Link</label>
+    <input type="text" class="form-control" id="PostLink" name="newPostLink" autocomplete="off">
 </div>
 <button class="btn btn-primary" type="submit">Publish</button>
 </form>
