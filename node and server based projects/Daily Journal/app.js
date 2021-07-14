@@ -4,6 +4,8 @@ const ejs = require("ejs");
 
 const lodash=require("lodash");
 
+require("dotenv").config();
+
 // Mongoose connection
 const dbUrl="mongodb+srv://himat1607:"+process.env.mongodbpass+"@cluster0.6rfsg.mongodb.net/journalDB?retryWrites=true&w=majority";
 mongoose.connect(dbUrl,{useNewUrlParser:true,useUnifiedTopology:true,useFindAndModify:false});

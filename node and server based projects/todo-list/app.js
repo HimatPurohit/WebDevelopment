@@ -3,6 +3,8 @@ const mongoose=require("mongoose");
 const lodash=require("lodash");
 // const date=require(__dirname+"/date.js");
 
+require("dotenv").config();
+
 let port = process.env.PORT;
 
 const app=express();
