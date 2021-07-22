@@ -17,19 +17,19 @@ function CreateArea(props) {
     setNote(prevNote => {
       return {
         ...prevNote,
-        [name]: value.trim()
+        [name]: value
       };
     });
   }
 
   function submitNote(event) {
-      if(note.title!=="" && note.content!==""){
+      if(note.title.trim()!=="" && note.content.trim()!==""){
         props.onAdd(note);
-        setNote({
-          title: "",
-          content: ""
-        });
       }
+      setNote({
+        title: "",
+        content: ""
+      });
     event.preventDefault();
   }
 
