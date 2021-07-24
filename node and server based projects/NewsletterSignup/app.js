@@ -33,7 +33,7 @@ app.get("/",function(req,res){
 
     const options={
         method: "POST",
-        auth: "himat:b433495b9bf3825acd6455e8201809fc-us6"
+        auth: "himat:"+process.env.apikey
     };
 
     const request = https.request(url, options, function(response){
