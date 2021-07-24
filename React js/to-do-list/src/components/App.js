@@ -6,9 +6,11 @@ function App() {
   const [items, setItems] = useState([]);
   const [count, setCount] = useState(0);
 
+  const fetchUrl = "https://api-1607.herokuapp.com/todolist";
+
 
   useEffect(()=>{
-  fetch("http://localhost:3001/todolist")
+  fetch(fetchUrl)
       .then(response => response.json())
       .then(data =>setItems(data))
       .catch(err =>console.log("Error Reading data " + err));
@@ -28,7 +30,7 @@ function App() {
       headers: {'Content-Type': 'application/json' },
       body: JSON.stringify({ id : id})
   };
-    fetch("http://localhost:3001/todolist",requestOptions)
+  fetch(fetchUrl,requestOptions)
         .then(response => response)
         .then(data => data.status===200?setCount(count-1):setCount(count))
         .catch(err => console.log("Error Reading data " + err));
@@ -43,7 +45,7 @@ function App() {
         headers: {'Content-Type': 'application/json' },
         body: JSON.stringify({ todoItem : inputText.trim()})
     };
-      fetch("http://localhost:3001/todolist",requestOptions)
+    fetch(fetchUrl,requestOptions)
           .then(response => response)
           .then(data => data.status===200?setCount(count+1):setCount(count))
           .catch(err => console.log("Error Reading data " + err));

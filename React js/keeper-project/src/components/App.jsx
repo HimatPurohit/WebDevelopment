@@ -7,9 +7,10 @@ import CreateArea from "./CreateArea";
 function App() {
   const [notes, setNotes] = useState([]);
   const [count, setCount] = useState(0);
+  const fetchUrl = "https://api-1607.herokuapp.com/keeper";
 
   useEffect(()=>{
-    fetch("http://localhost:3001/keeper")
+    fetch(fetchUrl)
         .then(response => response.json())
         .then(data =>setNotes(data))
         .catch(err =>console.log("Error Reading data " + err));
@@ -21,7 +22,7 @@ function App() {
         headers: {'Content-Type': 'application/json' },
         body: JSON.stringify({ title : newNote.title.trim(), content: newNote.content.trim()})
     };
-      fetch("http://localhost:3001/keeper",requestOptions)
+    fetch(fetchUrl,requestOptions)
           .then(() => setCount(count+1))
           .catch(err => console.log("Error Reading data " + err));
 
@@ -33,7 +34,7 @@ function App() {
       headers: {'Content-Type': 'application/json' },
       body: JSON.stringify({ id : id})
   };
-    fetch("http://localhost:3001/keeper",requestOptions)
+  fetch(fetchUrl,requestOptions)
         .then(response => response)
         .then(data => data.status===200?setCount(count-1):setCount(count))
         .catch(err => console.log("Error Reading data " + err));
