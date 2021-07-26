@@ -23,7 +23,7 @@ const Post=mongoose.model("Post",postSchema);
 
 const homeStartingContent = "This Journal is used to post what I code while learning or for fun.\nThis Journal App is made using Express Node Framework and uses MongoDB for a database to post and fetch posts displayed here using mongoose ODM.";
 const aboutContent = "Updating Soon...";
-const contactContent = "Email: himatpurohit1607@gmail.com\nPh No: +91 99309 12606\nUpdating Soon...";
+const contactContent = "Updating Soon...";
 
 const app = express();
 
@@ -42,10 +42,12 @@ app.get("/",function(req,res){
   })
 })
 .get("/about",function(req,res){
-  res.render("about",{aboutContent:aboutContent});
+  // res.render("about",{aboutContent:aboutContent});
+  res.render("about");
 })
 .get("/contact",function(req,res){
-  res.render("contact",{contactContent:contactContent});
+  // res.render("contact",{contactContent:contactContent});
+  res.render("contact");
 })
 .get("/post/:postId",function(req,res){
   // const searchTitle=lodash.lowerCase(req.params.postTitle);
